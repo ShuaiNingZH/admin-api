@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { addUser, deleteUser, getMenus, getUser, getUserList, updateUser } from '@/controllers/userController';
+import { addUser, deleteUser, getMenus, getUserInfo, getUserList, updateUser } from '@/controllers/userController';
 import { authenticate } from '@/middlewares/authMiddleware';
 
 const router = Router();
 
 // 获取当前登录用户的信息
-router.get('/user', authenticate, getUser);
+router.get('/user', authenticate, getUserInfo);
 
 // 获取当前登录用户的菜单
 router.get('/user/menus', authenticate, getMenus);

@@ -6,8 +6,8 @@ import { idSchema } from '@/validators/commonValidators';
 import { userEditSchema, userQuerySchema, userSchema } from '@/validators/userValidators';
 
 // 获取当前登录用户的信息
-export const getUser = asyncHandler(async (req, res) => {
-  const user = await userService.getUser(req.userId!);
+export const getUserInfo = asyncHandler(async (req, res) => {
+  const user = await userService.getUserInfo(req.userId!);
   success(res, user);
 });
 

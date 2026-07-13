@@ -4,7 +4,7 @@ import { hashPassword } from '@/utils/password';
 import { buildTree } from '@/utils/tree';
 
 // 获取当前登录用户的信息
-export async function getUser(userId: number) {
+export async function getUserInfo(userId: number) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: {
@@ -12,18 +12,39 @@ export async function getUser(userId: number) {
       phone: true,
       email: true,
       avatar: true,
+      gender: true,
+      isSystem: true,
     },
   });
 
   if (!user)
     throw new Error('用户不存在');
 
+  // 获取用户的按钮权限
+  const buttons = await prisma.menu.findMany({
+    where: {
+      type: 2,
+      status: true,
+      // 非管理员只能获取所拥有角色关联的按钮权限
+      ...(!user.isSystem && {
+        roles: {
+          some: {
+            role: {
+              users: {
+                some: { userId },
+              },
+            },
+          },
+        },
+      }),
+    },
+    select: { perm: true },
+  });
+
   return {
     userId,
-    nickname: user.nickname,
-    phone: user.phone,
-    email: user.email,
-    avatar: user.avatar,
+    ...user,
+    buttons: buttons.map(button => button.perm).filter((perm): perm is string => !!perm),
   };
 }
 
