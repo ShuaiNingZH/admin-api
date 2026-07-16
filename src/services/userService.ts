@@ -66,23 +66,42 @@ export async function getUserMenus(userId: number) {
   }
   else {
     // 获取用户对应角色的菜单
-    menus = await prisma.menu.findMany({
-      where: {
-        status: true,
-        roles: {
-          some: {
-            role: {
-              users: {
-                some: {
-                  userId,
+    const [checkedMenus, allMenus] = await Promise.all([
+      prisma.menu.findMany({
+        where: {
+          status: true,
+          type: { not: 2 },
+          roles: {
+            some: {
+              role: {
+                users: {
+                  some: { userId },
                 },
               },
             },
           },
         },
-      },
-      orderBy: { sort: 'asc' },
-    });
+        select: { id: true },
+      }),
+      prisma.menu.findMany({
+        where: { status: true, type: { not: 2 } },
+        orderBy: { sort: 'asc' },
+      }),
+    ]);
+
+    // 某些菜单是半选，需要向上查询
+    const menuById = new Map(allMenus.map(menu => [menu.id, menu]));
+    const keepIds = new Set<number>();
+
+    for (const { id } of checkedMenus) {
+      let cur = menuById.get(id);
+      while (cur && !keepIds.has(cur.id)) {
+        keepIds.add(cur.id);
+        cur = menuById.get(cur.parentId);
+      }
+    }
+
+    menus = allMenus.filter(menu => keepIds.has(menu.id));
   }
 
   return buildTree(menus);
