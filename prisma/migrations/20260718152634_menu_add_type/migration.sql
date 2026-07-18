@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE `meuns` ADD COLUMN `iframe` BOOLEAN NOT NULL DEFAULT false,
+    ADD COLUMN `link` VARCHAR(191) NULL;
