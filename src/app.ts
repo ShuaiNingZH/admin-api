@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import { errorHandler } from '@/middlewares/errorMiddlewar';
 import { httpLogger } from '@/middlewares/loggerMiddlewares';
 import { globalLimiter } from '@/middlewares/rateLimitMiddlewares';
+import aiRoutes from '@/routes/aiRoutes';
 import authRoutes from '@/routes/authRoutes';
 import menuRoutes from '@/routes/menuRoutes';
 import roleRoutes from '@/routes/roleRoutes';
@@ -47,6 +48,9 @@ app.use('/api', roleRoutes);
 
 // 上传路由
 app.use('/api', uploadRoutes);
+
+// AI 路由
+app.use('/api', aiRoutes);
 
 /* 注册路由 --- end */
 
